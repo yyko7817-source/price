@@ -1,10 +1,9 @@
 <!DOCTYPE html>
-
 <html lang="ja">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>値札メーカー</title>
+<title>値札メーカー Ver2</title>
 
 <style>
 body{
@@ -12,51 +11,63 @@ body{
   margin:20px;
 }
 
-h1{
-  font-size:24px;
+#container{
+  position:relative;
+  display:inline-block;
+  max-width:100%;
 }
 
 #preview{
-  margin-top:20px;
   max-width:100%;
-  border:1px solid #ccc;
   display:none;
+  border:1px solid #ccc;
+}
+
+#selection{
+  position:absolute;
+  border:3px solid red;
+  display:none;
+  pointer-events:none;
+  box-sizing:border-box;
 }
 
 .info{
+  margin:10px 0;
   color:#666;
-  margin-top:10px;
 }
 </style>
-
 </head>
 
 <body>
 
 <h1>値札メーカー</h1>
 
-<input
-  type="file"
-  id="imageInput"
-  accept="image/*"
->
+<input type="file" id="imageInput" accept="image/*">
+
 <div class="info">
-画像を選択してください
+画像を選択後、指で範囲をドラッグしてください
 </div>
 
-<img id="preview">
+<div id="container">
+  <img id="preview">
+  <div id="selection"></div>
+</div>
 
 <script>
+
 const imageInput = document.getElementById("imageInput");
 const preview = document.getElementById("preview");
+const selection = document.getElementById("selection");
+
+let startX = 0;
+let startY = 0;
+let isSelecting = false;
 
 imageInput.addEventListener("change", function(event){
 
   const file = event.target.files[0];
 
-  if(!file){
-    return;
-  }
+  if(!file) return;
 
   const reader = new FileReader();
 
@@ -68,11 +79,66 @@ imageInput.addEventListener("change", function(event){
   reader.readAsDataURL(file);
 
 });
+
+function getPosition(event){
+
+  const rect = preview.getBoundingClientRect();
+
+  const touch = event.touches[0];
+
+  return {
+    x: touch.clientX - rect.left,
+    y: touch.clientY - rect.top
+  };
+
+}
+
+preview.addEventListener("touchstart", function(event){
+
+  const pos = getPosition(event);
+
+  startX = pos.x;
+  startY = pos.y;
+
+  selection.style.left = startX + "px";
+  selection.style.top = startY + "px";
+  selection.style.width = "0px";
+  selection.style.height = "0px";
+  selection.style.display = "block";
+
+  isSelecting = true;
+
+});
+
+preview.addEventListener("touchmove", function(event){
+
+  if(!isSelecting) return;
+
+  event.preventDefault();
+
+  const pos = getPosition(event);
+
+  const width = pos.x - startX;
+  const height = pos.y - startY;
+
+  selection.style.width = Math.abs(width) + "px";
+  selection.style.height = Math.abs(height) + "px";
+
+  selection.style.left =
+    Math.min(startX, pos.x) + "px";
+
+  selection.style.top =
+    Math.min(startY, pos.y) + "px";
+
+},{ passive:false });
+
+preview.addEventListener("touchend", function(){
+
+  isSelecting = false;
+
+});
+
 </script>
+
 </body>
 </html>
-
-
-
-
-  
