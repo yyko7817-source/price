@@ -1,13 +1,74 @@
 <!DOCTYPE html>
 
-<html>
+<html lang="ja">
 <head>
 <meta charset="utf-8">
-<title>テストページ</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>値札メーカー</title>
+
+<style>
+body{
+  font-family:sans-serif;
+  margin:20px;
+}
+
+h1{
+  font-size:24px;
+}
+
+#preview{
+  margin-top:20px;
+  max-width:100%;
+  border:1px solid #ccc;
+  display:none;
+}
+
+.info{
+  color:#666;
+  margin-top:10px;
+}
+</style>
+
 </head>
+
 <body>
-<h1>GitHub Pages成功！</h1>
-<p>このページが見えたら公開できています。<
+
+<h1>値札メーカー</h1>
+
+<inputtype="file"id="imageInput"accept="image/*"
+<div class="info">
+画像を選択してください
+</div>
+
+<img id="preview">
+
+<script>
+const imageInput = document.getElementById("imageInput");
+const preview = document.getElementById("preview");
+
+imageInput.addEventListener("change", function(event){
+
+  const file = event.target.files[0];
+
+  if(!file){
+    return;
+  }
+
+  const reader = new FileReader();
+
+  reader.onload = function(e){
+    preview.src = e.target.result;
+    preview.style.display = "block";
+  };
+
+  reader.readAsDataURL(file);
+
+});
+</script>
 </body>
 </html>
-:::
+
+
+
+
+  
